@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Site Survey to Instant Quote</title>
+</head>
+<body>
+<style>
+  :root{
+    --navy:#003050; --navy2:#0a4a73; --accent:#1C6EA4; --accent-soft:#e6eef4;
+    --ink:#1b2029; --soft:#5e6675; --faint:#9aa1ad; --line:#e4e2db;
+    --bg:#eef1f4; --panel:#ffffff; --warn:#C25E12; --warnbg:#fbeee3;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+    --shadow:0 1px 2px rgba(0,30,60,.06),0 14px 40px rgba(0,30,60,.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.5;-webkit-font-smoothing:antialiased;padding:22px 16px;min-height:100vh;overflow-x:hidden}
+  .wrap{max-width:720px;width:100%;margin:0 auto}
+  .wide{max-width:860px}
+
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    background:var(--navy);color:#fff;border-radius:14px;padding:15px 22px;margin-bottom:18px;box-shadow:var(--shadow)}
+  header.top .k{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#7fb4d6}
+  header.top h1{font-size:18px;font-weight:800;letter-spacing:-.01em;margin-top:3px}
+  header.top .badge{font-size:11px;font-weight:700;color:#cfe0ec;background:rgba(255,255,255,.12);padding:5px 12px;border-radius:999px}
+
+  /* WIZARD */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  .prog{height:5px;background:#e8ebee}
+  .prog .bar{height:100%;background:var(--navy);transition:width .35s ease;border-radius:0 3px 3px 0}
+  .cardin{padding:30px 34px 26px}
+  .stepmeta{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:9px}
+  .steptitle{font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--ink);margin-bottom:5px;text-wrap:balance}
+  .stepsub{font-size:13.5px;color:var(--soft);margin-bottom:22px;max-width:48ch}
+
+  .q{margin-bottom:18px}
+  .q label{display:block;font-size:11.5px;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.03em;margin-bottom:6px}
+  .q input,.q select{width:100%;font-family:inherit;font-size:16px;color:var(--ink);background:#fbfaf7;
+    border:1.5px solid var(--line);border-radius:10px;padding:13px 14px}
+  .q input[type=number]{font-size:22px;font-weight:700;text-align:left;font-variant-numeric:tabular-nums;max-width:220px}
+  .q input:focus,.q select:focus{outline:none;border-color:var(--navy);background:#fff;box-shadow:0 0 0 3px var(--accent-soft)}
+  .q input::placeholder{color:var(--faint);font-weight:400}
+  .q input[type=number]::placeholder{font-size:15px;font-weight:400;color:var(--faint)}
+  .q select:invalid{color:var(--faint)}
+  .q input.err,.q select.err{border-color:#C0392B!important;box-shadow:0 0 0 3px #f6e0de!important}
+  .chk.err{border-color:#C0392B}
+  .err-msg{color:#C0392B;font-size:13px;font-weight:600;margin-top:14px}
+  .q .hint{font-size:12px;color:var(--faint);margin-top:6px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+  .checks{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .chk{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink);font-weight:600;cursor:pointer;
+    background:#fbfaf7;border:1.5px solid var(--line);border-radius:10px;padding:13px 14px;transition:.15s}
+  .chk input{width:18px;height:18px;accent-color:var(--navy)}
+  .chk.on{border-color:var(--navy);background:var(--accent-soft)}
+
+  .nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:26px}
+  .btn{border:none;border-radius:11px;padding:13px 22px;font-weight:700;font-size:14.5px;cursor:pointer;font-family:inherit}
+  .btn.next{background:var(--navy);color:#fff;margin-left:auto}
+  .btn.next:hover{background:var(--navy2)}
+  .btn.back{background:transparent;color:var(--soft);padding-left:4px}
+  .btn.back:hover{color:var(--ink)}
+  .btn.back.hidden{visibility:hidden}
+
+  /* review */
+  .review{display:grid;grid-template-columns:1fr 1fr;gap:8px 22px;margin-bottom:6px}
+  .review .it{display:flex;justify-content:space-between;border-bottom:1px dotted #dadfe4;padding:7px 0;font-size:13.5px}
+  .review .it b{color:var(--navy);font-variant-numeric:tabular-nums}
+
+  /* RESULT / PAPER */
+  .resulthead{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+  .resulthead .msg{font-size:14px;color:var(--soft)}
+  .resulthead .msg b{color:var(--navy)}
+  .resbtns{display:flex;gap:9px}
+  .btn.ghost{background:#fff;border:1.5px solid var(--line);color:var(--ink)}
+  .btn.ghost:hover{border-color:var(--navy);color:var(--navy)}
+
+  .paperwrap{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:5px;box-shadow:var(--shadow)}
+  .paper{background:#fff;border-radius:10px;padding:40px 44px;font-size:12.5px;color:#222}
+  .doc-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--navy);padding-bottom:14px;margin-bottom:18px}
+  .doc-head .co{font-size:17px;font-weight:800;letter-spacing:1px;color:var(--navy)}
+  .doc-head .co span{display:block;font-size:8.5px;font-weight:600;letter-spacing:1.5px;color:var(--soft);text-transform:uppercase;margin-top:3px}
+  .doc-head .meta{text-align:right;font-size:10.5px;color:var(--soft);line-height:1.6}
+  .doc-title{font-size:19px;font-weight:800;color:var(--navy);margin-bottom:3px;letter-spacing:-.01em}
+  .doc-sub{font-size:12px;color:var(--soft);margin-bottom:20px}
+  .sec{margin-bottom:18px}
+  .sec h3{font-size:12px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #cdd6dd;padding-bottom:4px;margin-bottom:8px}
+  .sec p{font-size:12.5px;line-height:1.55;margin-bottom:7px;color:#2a2f38}
+  .ov{display:grid;grid-template-columns:1fr 1fr;gap:5px 24px}
+  .ov .it{display:flex;justify-content:space-between;border-bottom:1px dotted #d8ddE2;padding:4px 0;font-size:12px}
+  .ov .it b{color:var(--navy);font-variant-numeric:tabular-nums}
+  ul.rec{list-style:none}
+  ul.rec li{font-size:12.5px;padding:5px 0 5px 20px;position:relative;border-bottom:1px solid #eef0f2}
+  ul.rec li::before{content:"";position:absolute;left:2px;top:10px;width:7px;height:7px;background:var(--navy);border-radius:2px}
+  ul.rec li b{color:var(--navy);font-variant-numeric:tabular-nums}
+  .scope{width:100%;border-collapse:collapse;margin-top:4px;font-size:12px}
+  .scope td{padding:7px 8px;border-bottom:1px solid #e8eaed}
+  .scope td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;color:var(--navy)}
+  .scope tr.tot td{border-top:2px solid var(--navy);border-bottom:none;font-weight:800;font-size:13px;color:var(--navy);padding-top:10px}
+  .scope tr.tot td small{font-weight:500;color:var(--soft)}
+  .samp{font-size:10px;font-weight:700;color:var(--warn);background:var(--warnbg);padding:3px 9px;border-radius:999px;vertical-align:middle;margin-left:6px}
+  .foot{margin-top:24px;border-top:1px solid #cdd6dd;padding-top:12px;font-size:10.5px;color:var(--soft);line-height:1.5}
+  .tag{display:inline-block;background:var(--accent-soft);color:var(--navy);font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;margin-right:4px}
+
+  .hide{display:none!important}
+  @media(max-width:620px){.row2,.review,.ov,.checks{grid-template-columns:1fr}.cardin{padding:24px 22px}}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+  @media print{
+    body{background:#fff;padding:0}
+    header.top,.resulthead,.paperwrap{box-shadow:none;border:none}
+    header.top,.resulthead{display:none}
+    .paperwrap{padding:0}.paper{padding:0}
+  }
+</style>
+
+<div class="wrap" id="root">
+  <header class="top">
+    <div><div class="k">Working demo · built by Vera Level Apps</div><h1>Site Survey → Instant Quote</h1></div>
+    <div class="badge">Sample / demo</div>
+  </header>
+
+  <!-- WIZARD -->
+  <div class="card" id="wizard">
+    <div class="prog"><div class="bar" id="bar"></div></div>
+    <div class="cardin">
+      <div class="stepmeta" id="stepmeta"></div>
+      <div class="steptitle" id="steptitle"></div>
+      <div class="stepsub" id="stepsub"></div>
+      <div id="stepbody"></div>
+      <div class="nav">
+        <button class="btn back" id="backBtn">← Back</button>
+        <button class="btn next" id="nextBtn">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ensure mobile renders at device width
+(function(){var m=document.querySelector('meta[name=viewport]');if(!m){m=document.createElement('meta');m.name='viewport';document.head.appendChild(m);}m.content='width=device-width, initial-scale=1, viewport-fit=cover';})();
+
+const D={
+  name:"", addr:"", type:"",
+  floors:"", rooms:"", exits:"", occ:"", cams:"", access:"", zones:"",
+  m_alarm:false, m_fire:false, m_video:false, m_access:false
+};
+const STEPS=[
+  {meta:"Site details", title:"Site details", sub:"Client and location information for this survey.",
+   body:`<div class="q"><label>Client / site name</label><input id="name" placeholder="e.g. Riverside Dental Group"></div>
+         <div class="q"><label>Site address</label><input id="addr" placeholder="e.g. 482 Wharncliffe Rd S, London, ON"></div>
+         <div class="q"><label>Site type</label><select id="type">
+           <option value="" disabled selected>Select site type…</option>
+           <option>Office</option><option>Medical / Clinic</option><option>Retail</option><option>Warehouse</option><option>Industrial</option><option>Residential</option><option>School</option>
+         </select></div>`},
+  {meta:"Building layout", title:"Building layout", sub:"Size and access points of the surveyed premises.",
+   body:`<div class="row2">
+           <div class="q"><label>Floors</label><input id="floors" type="number" min="1" placeholder="e.g. 2"></div>
+           <div class="q"><label>Max occupancy</label><input id="occ" type="number" min="0" placeholder="e.g. 40"></div>
+         </div>
+         <div class="row2">
+           <div class="q"><label>Number of rooms</label><input id="rooms" type="number" min="0" placeholder="e.g. 14"></div>
+           <div class="q"><label>Exits / doors</label><input id="exits" type="number" min="0" placeholder="e.g. 4"></div>
+         </div>`},
+  {meta:"Camera coverage", title:"Camera coverage", sub:"Number of surveillance cameras required for the site.",
+   body:`<div class="q"><label>Cameras required</label><input id="cams" type="number" min="0" placeholder="e.g. 8">
+         <div class="hint">Typically one per entrance and exit, plus key interior areas.</div></div>`},
+  {meta:"Access & alarm", title:"Access control and alarm", sub:"Controlled doors and protected zones for this system.",
+   body:`<div class="row2">
+           <div class="q"><label>Access-controlled doors</label><input id="access" type="number" min="0" placeholder="e.g. 3"></div>
+           <div class="q"><label>Alarm zones</label><input id="zones" type="number" min="0" placeholder="e.g. 6"></div>
+         </div>`},
+  {meta:"Monitoring", title:"Monitoring services", sub:"24/7 services to include in this proposal.",
+   body:`<div class="checks">
+           <label class="chk" data-k="m_alarm"><input type="checkbox" id="m_alarm"> Alarm</label>
+           <label class="chk" data-k="m_fire"><input type="checkbox" id="m_fire"> Fire</label>
+           <label class="chk" data-k="m_video"><input type="checkbox" id="m_video"> Live video</label>
+           <label class="chk" data-k="m_access"><input type="checkbox" id="m_access"> Access logs</label>
+         </div>`},
+  {meta:"Review", title:"Review and generate", sub:"Confirm the survey details, then generate the proposal.", review:true}
+];
+let step=0;
+const $=id=>document.getElementById(id);
+const txt=['name','addr','type'], nums=['floors','occ','rooms','exits','cams','access','zones'], chk=['m_alarm','m_fire','m_video','m_access'];
+
+function paint(){
+  const s=STEPS[step];
+  $('bar').style.width=((step)/(STEPS.length-1)*100)+'%';
+  $('stepmeta').textContent=`Step ${step+1} of ${STEPS.length} · ${s.meta}`;
+  $('steptitle').textContent=s.title;
+  $('stepsub').textContent=s.sub;
+  if(s.review){ $('stepbody').innerHTML=reviewHTML(); }
+  else { $('stepbody').innerHTML=s.body; hydrate(); }
+  $('backBtn').classList.toggle('hidden',step===0);
+  $('nextBtn').textContent = s.review ? 'Generate quote ✓' : 'Next →';
+  const first=$('stepbody').querySelector('input,select'); if(first&&!s.review) setTimeout(()=>first.focus(),40);
+}
+function hydrate(){
+  txt.forEach(k=>{if($(k))$(k).value=D[k];});
+  nums.forEach(k=>{if($(k))$(k).value=D[k];});
+  chk.forEach(k=>{const el=$(k); if(el){el.checked=D[k]; el.closest('.chk').classList.toggle('on',D[k]);
+    el.closest('.chk').addEventListener('click',()=>{setTimeout(()=>{D[k]=el.checked;el.closest('.chk').classList.toggle('on',el.checked);
+      $('stepbody').querySelectorAll('.chk').forEach(c=>c.classList.remove('err')); clearMsg();},0);});}});
+  $('stepbody').querySelectorAll('input,select').forEach(el=>{
+    const isNum = el.type==='number';
+    if(isNum){
+      el.setAttribute('inputmode','numeric');
+      el.addEventListener('keydown',e=>{ if(['e','E','+','-','.',','].includes(e.key)) e.preventDefault(); });
+    }
+    el.addEventListener('input',()=>{
+      if(isNum){ let v=el.value.replace(/[^0-9]/g,''); if(v.length>5)v=v.slice(0,5); if(el.value!==v) el.value=v; }
+      el.classList.remove('err'); clearMsg(); grab();
+    });
+    el.addEventListener('change',()=>{ el.classList.remove('err'); clearMsg(); });
+    el.addEventListener('keydown',e=>{ if(e.key==='Enter'&&el.type!=='checkbox'){e.preventDefault();go(1);} });
+  });
+}
+function grab(){
+  txt.forEach(k=>{if($(k))D[k]=$(k).value;});
+  nums.forEach(k=>{if($(k))D[k]=Math.max(0,parseInt($(k).value)||0);});
+  chk.forEach(k=>{if($(k))D[k]=$(k).checked;});
+}
+function reviewHTML(){
+  const mon=chk.filter(k=>D[k]).map(k=>({m_alarm:'Alarm',m_fire:'Fire',m_video:'Live video',m_access:'Access logs'}[k])).join(', ')||'none';
+  return `<div class="review">
+    <div class="it"><span>Site</span><b>${esc(D.name)}</b></div>
+    <div class="it"><span>Type</span><b>${esc(D.type)}</b></div>
+    <div class="it"><span>Floors</span><b>${D.floors}</b></div>
+    <div class="it"><span>Rooms</span><b>${D.rooms}</b></div>
+    <div class="it"><span>Exits / doors</span><b>${D.exits}</b></div>
+    <div class="it"><span>Max occupancy</span><b>${D.occ}</b></div>
+    <div class="it"><span>Cameras</span><b>${D.cams}</b></div>
+    <div class="it"><span>Access doors</span><b>${D.access}</b></div>
+    <div class="it"><span>Alarm zones</span><b>${D.zones}</b></div>
+    <div class="it"><span>Monitoring</span><b>${mon}</b></div>
+  </div>`;
+}
+function clearMsg(){ const m=$('stepbody').querySelector('.err-msg'); if(m)m.remove(); }
+function validateCurrent(){
+  const s=STEPS[step]; if(s.review) return true;
+  const body=$('stepbody'); let ok=true; clearMsg();
+  body.querySelectorAll('input:not([type=checkbox]),select').forEach(el=>{
+    el.classList.remove('err');
+    if(!el.value || !String(el.value).trim()){ el.classList.add('err'); ok=false; }
+  });
+  const cbs=body.querySelectorAll('input[type=checkbox]');
+  if(cbs.length && ![...cbs].some(c=>c.checked)){ body.querySelectorAll('.chk').forEach(c=>c.classList.add('err')); ok=false; }
+  if(!ok){
+    const msg=document.createElement('div'); msg.className='err-msg';
+    msg.textContent = cbs.length ? 'Select at least one option to continue.' : 'Please fill in every field to continue.';
+    body.appendChild(msg);
+  }
+  return ok;
+}
+function go(dir){
+  if(!STEPS[step].review) grab();
+  if(dir>0 && !validateCurrent()) return;
+  if(dir>0 && step===STEPS.length-1){ generate(); return; }
+  step=Math.min(STEPS.length-1,Math.max(0,step+dir));
+  paint();
+}
+$('nextBtn').onclick=()=>go(1);
+$('backBtn').onclick=()=>go(-1);
+
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+const money=n=>'$'+Math.round(n).toLocaleString('en-CA');
+
+function generate(){
+  const today=new Date().toLocaleDateString('en-CA',{year:'numeric',month:'long',day:'numeric'});
+  const review=new Date(Date.now()+365*864e5).toLocaleDateString('en-CA',{year:'numeric',month:'long',day:'numeric'});
+  const R={cam:420,access:650,zone:120,monBase:45,monVideo:30};
+  const camCost=D.cams*R.cam, accCost=D.access*R.access, zoneCost=D.zones*R.zone;
+  const installHrs=Math.ceil(D.cams*1.5+D.access*2+D.zones*0.5+D.exits*0.5);
+  const installCost=installHrs*95;
+  const oneTime=camCost+accCost+zoneCost+installCost;
+  const monthly=(D.m_alarm?R.monBase:0)+(D.m_video?R.monVideo:0)+(D.m_fire?15:0)+(D.m_access?20:0);
+  const monNames={m_alarm:'Alarm',m_fire:'Fire',m_video:'Live video',m_access:'Access logs'};
+  const mon=chk.filter(k=>D[k]).map(k=>monNames[k]);
+
+  document.getElementById('root').classList.add('wide');
+  document.getElementById('wizard').outerHTML=`
+    <div class="resulthead">
+      <div class="msg"><b>Survey complete.</b> These details generated a full proposal automatically, with no manual re-entry.</div>
+      <div class="resbtns">
+        <button class="btn ghost" onclick="location.reload()">↺ Edit answers</button>
+        <button class="btn next" style="margin:0" onclick="window.print()">Print / Save PDF</button>
+      </div>
+    </div>
+    <div class="paperwrap"><div class="paper">
+      <div class="doc-head">
+        <div class="co">[ YOUR COMPANY ]<span>Security systems · monitoring · consulting</span></div>
+        <div class="meta">Quote #${1000+D.rooms+D.cams}<br>Prepared ${today}<br>Valid 30 days</div>
+      </div>
+      <div class="doc-title">Security System Proposal <span class="samp">SAMPLE</span></div>
+      <div class="doc-sub">${esc(D.name)}${D.addr?' · '+esc(D.addr):''}</div>
+      <div class="sec"><h3>Site overview</h3><div class="ov">
+        <div class="it"><span>Site type</span><b>${esc(D.type)}</b></div>
+        <div class="it"><span>Floors</span><b>${D.floors}</b></div>
+        <div class="it"><span>Rooms</span><b>${D.rooms}</b></div>
+        <div class="it"><span>Exits / doors</span><b>${D.exits}</b></div>
+        <div class="it"><span>Max occupancy</span><b>${D.occ}</b></div>
+        <div class="it"><span>Cameras</span><b>${D.cams}</b></div>
+      </div></div>
+      <div class="sec"><h3>Recommended system</h3>
+        <p>Based on the survey of this ${D.floors}-floor, ${D.rooms}-room ${esc(D.type).toLowerCase()} with ${D.exits} exit${D.exits===1?'':'s'}, we recommend:</p>
+        <ul class="rec">
+          <li><b>${D.cams}</b> surveillance camera${D.cams===1?'':'s'} covering entrances, ${D.exits} exit${D.exits===1?'':'s'} and key interior areas</li>
+          <li><b>${D.zones}</b> alarm zone${D.zones===1?'':'s'} across the ${D.rooms} rooms and perimeter</li>
+          <li><b>${D.access}</b> access-controlled door${D.access===1?'':'s'} with audit logging</li>
+          <li>24/7 monitoring: ${mon.length?mon.join(', '):'none selected'}</li>
+        </ul>
+      </div>
+      <div class="sec"><h3>Investment summary <span style="font-weight:500;color:var(--soft);text-transform:none;font-size:10px">(placeholder rates)</span></h3>
+        <table class="scope">
+          <tr><td>Surveillance cameras (${D.cams} × ${money(R.cam)})</td><td>${money(camCost)}</td></tr>
+          <tr><td>Access control (${D.access} × ${money(R.access)})</td><td>${money(accCost)}</td></tr>
+          <tr><td>Alarm zones (${D.zones} × ${money(R.zone)})</td><td>${money(zoneCost)}</td></tr>
+          <tr><td>Installation &amp; configuration (${installHrs} hrs)</td><td>${money(installCost)}</td></tr>
+          <tr class="tot"><td>One-time total <small>(before tax)</small></td><td>${money(oneTime)}</td></tr>
+          <tr><td>Monitoring <small style="color:var(--soft)">(${mon.length} service${mon.length===1?'':'s'})</small></td><td>${money(monthly)}/mo</td></tr>
+        </table>
+      </div>
+      <div class="foot">
+        <span class="tag">Generated in seconds</span><span class="tag">No re-typing into Word</span>
+        <p style="margin-top:8px">Sample output, generated automatically from the survey inputs above. In the real version it uses your pricing and exports to your own quote format and branding. Demonstration built by Vera Level Apps Inc.</p>
+      </div>
+    </div></div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+paint();
+</script>
+
+</body>
+</html>
